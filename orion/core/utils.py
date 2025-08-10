@@ -259,6 +259,8 @@ def get_tiny_datasets(data_dir, batch_size, test_samples=10000, seed=None):
     # Download and prepare the Tiny-ImageNet dataset
     dataset_dir = download_and_prepare_tinyimagenet(data_dir)
 
+    print(f"Dataset directory: {dataset_dir}")
+
     if seed is not None:
         torch.manual_seed(seed)  # Set global seed for reproducibility
 
