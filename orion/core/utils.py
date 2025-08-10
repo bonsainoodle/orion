@@ -236,6 +236,8 @@ def download_and_prepare_tinyimagenet(data_dir='./data'):
             os.remove(val_annotations_file)
 
             print("Tiny-ImageNet dataset preparation complete.")
+
+            return dataset_dir
         finally:
             # Restore the original SSL context
             ssl._create_default_https_context = old_context
@@ -255,7 +257,7 @@ def get_tiny_datasets(data_dir, batch_size, test_samples=10000, seed=None):
         tuple: (train_loader, test_loader)
     """
     # Download and prepare the Tiny-ImageNet dataset
-    download_and_prepare_tinyimagenet(data_dir)
+    dataset_dir = download_and_prepare_tinyimagenet(data_dir)
 
     if seed is not None:
         torch.manual_seed(seed)  # Set global seed for reproducibility
@@ -285,8 +287,8 @@ def get_tiny_datasets(data_dir, batch_size, test_samples=10000, seed=None):
     ])
 
     # Define dataset directories
-    train_dir = f"{data_dir}/train"
-    test_dir = f"{data_dir}/val"
+    train_dir = f"{dataset_dir}/train"
+    test_dir = f"{dataset_dir}/val"
 
     # Load the Tiny-ImageNet datasets
     train_dataset = datasets.ImageFolder(train_dir, transform=transform_train)
