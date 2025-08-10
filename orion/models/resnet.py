@@ -107,9 +107,9 @@ class ResNet(on.Module):
 # CIFAR-10 / CIFAR-100 ResNets #
 ################################
 
-def ResNet20(dataset='cifar10'):
+def ResNet20(dataset='cifar10', block=BasicBlock):
     conv1_params, num_classes = get_resnet_config(dataset)
-    return ResNet(dataset, Bottleneck, [3,3,3], [16,32,64], conv1_params, num_classes)
+    return ResNet(dataset, block, [3,3,3], [16,32,64], conv1_params, num_classes)
 
 def ResNet32(dataset='cifar10'):
     conv1_params, num_classes = get_resnet_config(dataset)
