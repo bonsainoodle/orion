@@ -236,11 +236,11 @@ def download_and_prepare_tinyimagenet(data_dir='./data'):
             os.remove(val_annotations_file)
 
             print("Tiny-ImageNet dataset preparation complete.")
-
-            return dataset_dir
         finally:
             # Restore the original SSL context
             ssl._create_default_https_context = old_context
+        
+        return dataset_dir
 
 
 def get_tiny_datasets(data_dir, batch_size, test_samples=10000, seed=None):
