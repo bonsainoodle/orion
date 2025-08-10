@@ -240,7 +240,7 @@ def download_and_prepare_tinyimagenet(data_dir='./data'):
             # Restore the original SSL context
             ssl._create_default_https_context = old_context
         
-        return dataset_dir
+    return dataset_dir
 
 
 def get_tiny_datasets(data_dir, batch_size, test_samples=10000, seed=None):
