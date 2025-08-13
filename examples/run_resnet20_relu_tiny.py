@@ -16,7 +16,7 @@ torch.manual_seed(42)
 # Initialize the Orion scheme, model, and data
 scheme = orion.init_scheme("../configs/resnet.yml")
 trainloader, testloader = get_tiny_datasets(data_dir="../data", batch_size=1)
-net = models.ResNet20("tiny")
+net = models.ResNet20("tiny", models.BasicBlock)
 
 # Train model (optional)
 # device = "cuda" if torch.cuda.is_available() else "cpu"
