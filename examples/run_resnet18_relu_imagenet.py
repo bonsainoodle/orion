@@ -6,8 +6,9 @@ import orion.models as models
 from orion.core.utils import (
     get_cifar_datasets,
     get_tiny_datasets,
+    get_imagenet_datasets,
     mae,
-    train_on_cifar
+    train_on_imagenet
 )
 
 # Set seed for reproducibility
@@ -15,14 +16,12 @@ torch.manual_seed(42)
 
 # Initialize the Orion scheme, model, and data
 scheme = orion.init_scheme("../configs/resnet.yml")
-# NOT IMPLEMENTED YET, implement in orion.core.utils (see how they did for cifar10 and tiny)
-# If you can directly download from internet, download the dataset in orion_custom/data on the server (cifar10 and tiny have been downloaded there)
 trainloader, testloader = get_imagenet_datasets(data_dir="../data", batch_size=1)
 net = models.ResNet18("imagenet")
 
 # Train model (optional)
 # device = "cuda" if torch.cuda.is_available() else "cpu"
-# train_on_cifar(net, data_dir="../data", epochs=1, device=device)
+# train_on_imagenet(net, data_dir="../data", epochs=1, device=device)
 
 # Get a test batch to pass through our network
 inp, _ = next(iter(testloader))

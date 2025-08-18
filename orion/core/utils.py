@@ -356,6 +356,20 @@ def train_on_tiny(
     )
 
 
+def train_on_imagenet(
+    model, data_dir="./data", epochs=200, batch_size=128, lr=0.1,
+    momentum=0.9, weight_decay=5e-4, device="cpu", save_path=None
+):
+    """
+    Train a model on synthetic ImageNet-sized data.
+    """
+    train_loader, test_loader = get_imagenet_datasets(data_dir, batch_size)
+    train(
+        model, train_loader, test_loader, epochs, lr, momentum,
+        weight_decay, device, save_path
+    )
+
+
 def train(
     model, train_loader, test_loader, epochs, lr, momentum,
     weight_decay, device="cpu", save_path=None
@@ -463,6 +477,55 @@ def test_epoch(model, test_loader, criterion, device):
             })
 
     return 100. * correct / total
+
+def get_imagenet_datasets(data_dir, batch_size, test_samples=10000, seed=None):
+    """
+    Creates synthetic ImageNet-sized datasets with random data.
+    Since actual ImageNet cannot be downloaded automatically, this generates
+    random samples of the same size (224x224x3) for testing purposes.
+    
+    Parameters:
+        data_dir (str): Directory path (unused for synthetic data).
+        batch_size (int): Batch size for the DataLoaders.
+        test_samples (int): Number of samples to include in the test set.
+        seed (int, optional): Random seed for reproducibility.
+    
+    Returns:
+        tuple: (train_loader, test_loader)
+    """
+    # Acknowledge data_dir parameter (unused for synthetic data)
+    _ = data_dir
+    
+    if seed is not None:
+        torch.manual_seed(seed)
+    
+    # ImageNet specifications
+    num_classes = 1000
+    input_size = (3, 224, 224)
+    train_samples = 50000  # Reduced for practical testing
+    
+    # Generate random training data
+    train_data = torch.randn(train_samples, *input_size)
+    train_labels = torch.randint(0, num_classes, (train_samples,))
+    
+    # Generate random test data  
+    test_data = torch.randn(test_samples, *input_size)
+    test_labels = torch.randint(0, num_classes, (test_samples,))
+    
+    # Create tensor datasets
+    train_dataset = torch.utils.data.TensorDataset(train_data, train_labels)
+    test_dataset = torch.utils.data.TensorDataset(test_data, test_labels)
+    
+    # Create DataLoaders
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True
+    )
+    test_loader = DataLoader(
+        test_dataset, batch_size=batch_size
+    )
+    
+    return train_loader, test_loader
+
 
 def mae(tensor1, tensor2):
     if tensor1.shape != tensor2.shape:
