@@ -84,81 +84,50 @@ def get_mnist_datasets(data_dir, batch_size, test_samples=10000, seed=None):
 
 def get_cifar_datasets(data_dir, batch_size, test_samples=10000, seed=None):
     """
-    Loads CIFAR-10 datasets and returns training and test DataLoaders.
-    
+    Creates synthetic CIFAR-10-sized datasets with random data.
+    No actual data downloads to avoid network dependencies.
+
     Parameters:
-        data_dir (str): Directory to store/download the CIFAR-10 data.
+        data_dir (str): Directory path (unused for synthetic data).
         batch_size (int): Batch size for the DataLoaders.
         test_samples (int): Number of samples to include in the test set.
         seed (int, optional): Random seed for reproducibility.
-    
+
     Returns:
         tuple: (train_loader, test_loader)
     """
-    
-    # Create a secure SSL context using certifi. Otherwise we'll get a
-    # [SSL: CERTIFICATE_VERIFY_FAILED] error.
-    ssl_context = ssl.create_default_context(cafile=certifi.where())
-    old_context = ssl._create_default_https_context
-    ssl._create_default_https_context = lambda: ssl_context
+    # Acknowledge data_dir parameter (unused for synthetic data)
+    _ = data_dir
 
-    try:
-        if seed is not None:
-            torch.manual_seed(seed)  # Set the global seed for reproducibility
-            
-        # Define data transformations
-        transform_train = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                (0.4914, 0.4822, 0.4465), 
-                (0.2470, 0.2435, 0.2616)
-            ),
-        ])
+    if seed is not None:
+        torch.manual_seed(seed)
 
-        transform_test = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(
-                (0.4914, 0.4822, 0.4465), 
-                (0.2470, 0.2435, 0.2616)
-            ),
-        ])
+    # CIFAR-10 specifications
+    num_classes = 10
+    input_size = (3, 32, 32)
+    train_samples = 50000  # Standard CIFAR-10 training set size
 
-        # Try to download and load the training and test datasets
-        try:
-            train_dataset = datasets.CIFAR10(
-                data_dir, train=True, download=True, transform=transform_train
-            )
-            test_dataset = datasets.CIFAR10(
-                data_dir, train=False, download=True, transform=transform_test
-            )
-        except Exception as e:
-            raise RuntimeError(
-                str(e) + " Could not install CIFAR-10 dataset automatically " +
-                "You'll need to download it manually from torchvision.datasets.CIFAR10()"
-            )
+    # Generate random training data
+    train_data = torch.randn(train_samples, *input_size)
+    train_labels = torch.randint(0, num_classes, (train_samples,))
 
-        # Limit the number of test samples if necessary
-        if test_samples < len(test_dataset):
-            test_dataset, _ = random_split(
-                test_dataset,
-                [test_samples, len(test_dataset) - test_samples]
-            )
+    # Generate random test data
+    test_data = torch.randn(test_samples, *input_size)
+    test_labels = torch.randint(0, num_classes, (test_samples,))
 
-        # Create DataLoaders
-        train_loader = DataLoader(
-            train_dataset, batch_size=batch_size, shuffle=True
-        )
-        test_loader = DataLoader(
-            test_dataset, batch_size=batch_size
-        )
+    # Create tensor datasets
+    train_dataset = torch.utils.data.TensorDataset(train_data, train_labels)
+    test_dataset = torch.utils.data.TensorDataset(test_data, test_labels)
 
-        return train_loader, test_loader
-        
-    finally:
-        # Restore the original SSL context
-        ssl._create_default_https_context = old_context
+    # Create DataLoaders
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True
+    )
+    test_loader = DataLoader(
+        test_dataset, batch_size=batch_size
+    )
+
+    return train_loader, test_loader
 
 
 def download_and_prepare_tinyimagenet(data_dir='./data'):
@@ -245,63 +214,40 @@ def download_and_prepare_tinyimagenet(data_dir='./data'):
 
 def get_tiny_datasets(data_dir, batch_size, test_samples=10000, seed=None):
     """
-    Loads Tiny-ImageNet datasets and returns training and test DataLoaders.
-    
+    Creates synthetic Tiny-ImageNet-sized datasets with random data.
+    No actual data downloads to avoid network dependencies.
+
     Parameters:
-        data_dir (str): Directory to store/download Tiny-ImageNet data.
+        data_dir (str): Directory path (unused for synthetic data).
         batch_size (int): Batch size for the DataLoaders.
         test_samples (int): Number of samples to include in the test set.
         seed (int, optional): Random seed for reproducibility.
-    
+
     Returns:
         tuple: (train_loader, test_loader)
     """
-    # Download and prepare the Tiny-ImageNet dataset
-    dataset_dir = download_and_prepare_tinyimagenet(data_dir)
-
-    print(f"Dataset directory: {dataset_dir}")
+    # Acknowledge data_dir parameter (unused for synthetic data)
+    _ = data_dir
 
     if seed is not None:
-        torch.manual_seed(seed)  # Set global seed for reproducibility
+        torch.manual_seed(seed)
 
-    # Define data transformations
-    transform_train = transforms.Compose([
-        transforms.RandomResizedCrop(64),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(20),
-        transforms.ColorJitter(
-            brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1
-        ),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            (0.4802, 0.4481, 0.3975), 
-            (0.2302, 0.2265, 0.2262)
-        ),
-    ])
+    # Tiny-ImageNet specifications
+    num_classes = 200
+    input_size = (3, 64, 64)
+    train_samples = 100000  # Standard Tiny-ImageNet training set size
 
-    transform_test = transforms.Compose([
-        transforms.Resize(64),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            (0.4802, 0.4481, 0.3975), 
-            (0.2302, 0.2265, 0.2262)
-        ),
-    ])
+    # Generate random training data
+    train_data = torch.randn(train_samples, *input_size)
+    train_labels = torch.randint(0, num_classes, (train_samples,))
 
-    # Define dataset directories
-    train_dir = f"{dataset_dir}/train"
-    test_dir = f"{dataset_dir}/val"
+    # Generate random test data
+    test_data = torch.randn(test_samples, *input_size)
+    test_labels = torch.randint(0, num_classes, (test_samples,))
 
-    # Load the Tiny-ImageNet datasets
-    train_dataset = datasets.ImageFolder(train_dir, transform=transform_train)
-    test_dataset = datasets.ImageFolder(test_dir, transform=transform_test)
-
-    # Limit the number of test samples if necessary
-    if test_samples < len(test_dataset):
-        test_dataset, _ = random_split(
-            test_dataset,
-            [test_samples, len(test_dataset) - test_samples]
-        )
+    # Create tensor datasets
+    train_dataset = torch.utils.data.TensorDataset(train_data, train_labels)
+    test_dataset = torch.utils.data.TensorDataset(test_data, test_labels)
 
     # Create DataLoaders
     train_loader = DataLoader(
