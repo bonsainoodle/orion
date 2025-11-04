@@ -29,3 +29,9 @@ packages = [{include = "orion"}]
 [tool.poetry.build]
 generate-setup-file = true
 script = "tools/build_lattigo.py"
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+orion-fhe = { path = ".", editable = true }

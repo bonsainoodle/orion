@@ -160,7 +160,7 @@ def get_resnet_config(dataset):
     configs = {
         "cifar10": {"kernel_size": 3, "stride": 1, "padding": 1, "num_classes": 10},
         "cifar100": {"kernel_size": 3, "stride": 1, "padding": 1, "num_classes": 100},
-        "tiny": {"kernel_size": 7, "stride": 1, "padding": 3, "num_classes": 200},
+        "tiny": {"kernel_size": 7, "stride": 2, "padding": 3, "num_classes": 200},
         "imagenet": {"kernel_size": 7, "stride": 2, "padding": 3, "num_classes": 1000},
     }
 
