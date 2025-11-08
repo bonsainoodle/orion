@@ -12,11 +12,11 @@ mkdir -p "$LOGS_DIR"
 # Get timestamp for this run
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
-# List of scripts to run
+# List of scripts to run (using SiLU activation)
 SCRIPTS=(
-    "run_resnet20_relu_cifar10.py"
-    "run_resnet18_relu_tiny.py"
-    "run_resnet34_relu_imagenet.py"
+    "run_resnet20_silu_cifar10.py"
+    "run_resnet18_silu_tiny.py"
+    "run_resnet34_silu_imagenet.py"
 )
 
 echo "========================================="

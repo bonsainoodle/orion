@@ -6,8 +6,9 @@ import orion.models as models
 from orion.core.utils import (
     get_cifar_datasets,
     get_tiny_datasets,
+    get_imagenet_datasets,
     mae,
-    train_on_cifar
+    train_on_imagenet
 )
 
 # Set seed for reproducibility
@@ -15,12 +16,12 @@ torch.manual_seed(42)
 
 # Initialize the Orion scheme, model, and data
 scheme = orion.init_scheme("../configs/resnet.yml")
-trainloader, testloader = get_cifar_datasets(data_dir="../data", batch_size=1)
-net = models.ResNet20SiLU("cifar10")
+trainloader, testloader = get_imagenet_datasets(data_dir="../data", batch_size=1)
+net = models.ResNet34SiLU("imagenet")
 
 # Train model (optional)
 # device = "cuda" if torch.cuda.is_available() else "cpu"
-# train_on_cifar(net, data_dir="../data", epochs=1, device=device)
+# train_on_imagenet(net, data_dir="../data", epochs=1, device=device)
 
 # Get a test batch to pass through our network
 inp, _ = next(iter(testloader))
@@ -29,14 +30,14 @@ inp, _ = next(iter(testloader))
 net.eval()
 out_clear = net(inp)
 
-# Prepare for FHE inference. 
-# Some polynomial activation functions require knowing the range of possible 
-# input values. We'll estimate these ranges using training set statistics, 
+# Prepare for FHE inference.
+# Some polynomial activation functions require knowing the range of possible
+# input values. We'll estimate these ranges using training set statistics,
 # adjusted to be wider by a tolerance factor (= margin).
 orion.fit(net, inp)
 input_level = orion.compile(net)
 
-# Encode and encrypt the input vector 
+# Encode and encrypt the input vector
 vec_ptxt = orion.encode(inp, input_level)
 vec_ctxt = orion.encrypt(vec_ptxt)
 net.he()  # Switch to FHE mode
